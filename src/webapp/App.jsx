@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Search, User, MapPin, Activity, ChevronLeft, ChevronRight } from "lucide-react";
 
 const CSV_URL = new URL("./players.csv", import.meta.url).href;
 const RESULTS_PER_PAGE = 21;
@@ -182,85 +183,132 @@ function App() {
   }, [currentPage, totalPages]);
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_10%_20%,#1a5f48_0%,#051614_55%,#020a08_100%)] px-4 py-8 font-body text-chalk sm:px-8 lg:px-12">
-      <div className="mx-auto max-w-7xl animate-rise">
-        <header className="mb-8 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
-          <p className="text-xs uppercase tracking-[0.2em] text-amberline">Player Intelligence</p>
-          <h1 className="font-display text-3xl font-bold sm:text-4xl">Football Player Search</h1>
+    <div className="relative min-h-screen bg-dark-900 px-4 py-12 font-body text-slate-300 sm:px-8 lg:px-12 overflow-hidden selection:bg-cyan-500/30 selection:text-cyan-200">
+      {/* Background Ambient Orbs */}
+      <div className="pointer-events-none absolute -top-[20%] -left-[10%] h-[600px] w-[600px] rounded-full bg-cyan-600/10 blur-[120px]" />
+      <div className="pointer-events-none absolute top-[40%] -right-[10%] h-[500px] w-[500px] rounded-full bg-lime-600/10 blur-[120px]" />
 
-          <div className="mt-4 w-full max-w-xl">
-            <label htmlFor="search" className="mb-2 block text-sm text-slate-200">
-              Search players by keyword
-            </label>
-            <input
-              id="search"
-              type="text"
-              value={query}
-              onChange={(event) => {
-                setQuery(event.target.value);
-                setCurrentPage(1);
-              }}
-              placeholder="e.g. Harry"
-              className="w-full rounded-xl border border-pitch-500/50 bg-black/30 px-4 py-2.5 text-chalk placeholder:text-slate-400 outline-none transition focus:border-amberline focus:ring-2 focus:ring-amberline/30"
-            />
+      <div className="relative mx-auto max-w-7xl animate-fade-in">
+        <header className="mb-16 text-center">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-dark-600 bg-dark-800/50 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-cyan-400 backdrop-blur-md">
+            <Activity className="h-4 w-4" />
+            <span>StatXI</span>
+          </div>
+          <h1 className="mb-8 font-display text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
+            Discover the <span className="bg-gradient-to-r from-cyan-400 to-lime-400 bg-clip-text text-transparent">Elite.</span>
+          </h1>
+
+          <div className="mx-auto mt-8 w-full max-w-2xl animate-rise">
+            <div className="group relative flex items-center rounded-full border border-dark-600 bg-dark-800/80 px-6 py-4 shadow-2xl backdrop-blur-xl transition-all focus-within:border-cyan-500/50 focus-within:ring-4 focus-within:ring-cyan-500/10 hover:border-dark-600/80">
+              <Search className="mr-4 h-6 w-6 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+              <input
+                id="search"
+                type="text"
+                value={query}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setCurrentPage(1);
+                }}
+                placeholder="Search players by name..."
+                className="w-full bg-transparent text-lg font-medium text-white placeholder:text-slate-500 outline-none"
+              />
+            </div>
           </div>
         </header>
 
-        <section className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
-          <h2 className="font-display text-xl">Matching Players</h2>
-
-          {loadingDataset ? <p className="mt-3 text-slate-200">Loading players dataset...</p> : null}
-          {!loadingDataset && datasetError ? <p className="mt-3 text-red-200">{datasetError}</p> : null}
+        <section className="relative z-10 animate-rise" style={{ animationDelay: "0.2s" }}>
+          {loadingDataset ? (
+            <div className="flex h-40 items-center justify-center">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-500 border-t-transparent" />
+            </div>
+          ) : null}
+          {!loadingDataset && datasetError ? <p className="text-center text-red-400">{datasetError}</p> : null}
           {!loadingDataset && !datasetError && !query.trim() ? (
-            <p className="mt-3 text-slate-200">Type at least 3 letters to search players.</p>
+            <div className="flex flex-col items-center justify-center py-12 text-center text-slate-500">
+              <Search className="mb-4 h-12 w-12 opacity-20" />
+              <p className="text-lg">Type at least 3 letters to explore the database.</p>
+            </div>
           ) : null}
           {!loadingDataset && !datasetError && query.trim() && query.trim().length < 3 ? (
-            <p className="mt-3 text-slate-200">Enter at least 3 letters to start searching.</p>
+            <p className="text-center text-slate-400">Keep typing to search...</p>
           ) : null}
           {!loadingDataset && !datasetError && query.trim().length >= 3 && searchResults.length === 0 ? (
-            <p className="mt-3 text-red-200">No players found for this keyword.</p>
+            <p className="text-center text-red-400">No athletes found matching your criteria.</p>
           ) : null}
 
           {searchResults.length > 0 ? (
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {paginatedResults.map((player) => (
-                <article key={player.id} className="rounded-xl border border-white/10 bg-black/20 p-4">
-                  <p className="font-semibold text-slate-100">{player.name}</p>
-                  {player.longName && player.longName !== player.name ? (
-                    <p className="mt-1 text-xs text-slate-400">{player.longName}</p>
-                  ) : null}
-                  <p className="mt-2 text-sm text-slate-300">{player.nationality}</p>
-                  <p className="mt-1 text-xs text-slate-400">{player.position}</p>
+            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {paginatedResults.map((player, index) => (
+                <article
+                  key={player.id}
+                  className="group relative overflow-hidden rounded-3xl border border-dark-600 bg-dark-800/60 p-6 transition-all hover:-translate-y-1 hover:border-cyan-500/30 hover:bg-dark-800 hover:shadow-2xl hover:shadow-cyan-500/5 backdrop-blur-md"
+                  style={{ animationDelay: `${(index % RESULTS_PER_PAGE) * 0.05}s` }}
+                >
+                  {/* Background Watermark Rating */}
+                  {/* <div className="absolute -right-6 -bottom-8 pointer-events-none select-none text-[140px] font-display font-bold leading-none tracking-tighter text-white/[0.03] transition-colors group-hover:text-cyan-500/[0.05]">
+                    {player.overall}
+                  </div> */}
+
+                  <div className="relative z-10 flex flex-col h-full">
+                    <div className="mb-4 flex items-start justify-between">
+                      <div>
+                        <h3 className="font-display text-2xl font-bold text-white group-hover:text-cyan-50">{player.name}</h3>
+                        {player.longName && player.longName !== player.name ? (
+                          <p className="mt-1 text-sm text-slate-400">{player.longName}</p>
+                        ) : null}
+                      </div>
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-dark-700 text-cyan-400 border border-dark-600">
+                        <User className="h-5 w-5" />
+                      </div>
+                    </div>
+
+                    <div className="mt-auto pt-6">
+                      <div className="mb-4 flex items-center gap-2 text-sm text-slate-300">
+                        <MapPin className="h-4 w-4 text-lime-400" />
+                        <span>{player.nationality}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {player.position.split(',').map((pos, i) => (
+                          <span key={i} className="rounded-md border border-dark-600 bg-dark-900/50 px-2.5 py-1 text-xs font-medium text-slate-300">
+                            {pos.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </article>
               ))}
             </div>
           ) : null}
 
           {searchResults.length > 0 ? (
-            <div className="mt-5 flex flex-col gap-3 border-t border-white/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-slate-300">
-                Showing {(currentPage - 1) * RESULTS_PER_PAGE + 1}-
-                {Math.min(currentPage * RESULTS_PER_PAGE, searchResults.length)} of {searchResults.length}
+            <div className="mt-12 flex flex-col items-center justify-between gap-4 rounded-2xl border border-dark-600 bg-dark-800/50 p-4 sm:flex-row backdrop-blur-md">
+              <p className="text-sm font-medium text-slate-400">
+                Showing <span className="text-white">{(currentPage - 1) * RESULTS_PER_PAGE + 1}</span> to{" "}
+                <span className="text-white">{Math.min(currentPage * RESULTS_PER_PAGE, searchResults.length)}</span> of{" "}
+                <span className="text-white">{searchResults.length}</span> athletes
               </p>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
                   disabled={currentPage === 1}
-                  className="rounded-lg border border-white/20 px-3 py-1.5 text-sm text-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-dark-600 bg-dark-700 text-white transition-all hover:bg-dark-600 disabled:pointer-events-none disabled:opacity-30"
+                  aria-label="Previous page"
                 >
-                  Previous
+                  <ChevronLeft className="h-5 w-5" />
                 </button>
-                <span className="text-sm text-slate-300">
-                  Page {currentPage} / {totalPages}
-                </span>
+                <div className="flex h-10 items-center justify-center rounded-xl border border-dark-600 bg-dark-900/50 px-4 text-sm font-semibold text-white">
+                  {currentPage} / {totalPages}
+                </div>
                 <button
                   type="button"
                   onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
                   disabled={currentPage === totalPages}
-                  className="rounded-lg border border-white/20 px-3 py-1.5 text-sm text-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-dark-600 bg-dark-700 text-white transition-all hover:bg-dark-600 disabled:pointer-events-none disabled:opacity-30"
+                  aria-label="Next page"
                 >
-                  Next
+                  <ChevronRight className="h-5 w-5" />
                 </button>
               </div>
             </div>
