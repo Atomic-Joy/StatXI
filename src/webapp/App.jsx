@@ -257,9 +257,6 @@ function App() {
                           <p className="mt-1 text-sm text-slate-400">{player.longName}</p>
                         ) : null}
                       </div>
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-dark-700 text-cyan-400 border border-dark-600">
-                        <User className="h-5 w-5" />
-                      </div>
                     </div>
 
                     <div className="mt-auto pt-6">
