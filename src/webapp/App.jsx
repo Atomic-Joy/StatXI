@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search, User, MapPin, Activity, ChevronLeft, ChevronRight } from "lucide-react";
+import PlayerProfile from "./PlayerProfile";
 
 const CSV_URL = new URL("./players.csv", import.meta.url).href;
 const RESULTS_PER_PAGE = 21;
@@ -113,6 +114,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [loadingDataset, setLoadingDataset] = useState(true);
   const [datasetError, setDatasetError] = useState("");
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -189,35 +191,41 @@ function App() {
       <div className="pointer-events-none absolute top-[40%] -right-[10%] h-[500px] w-[500px] rounded-full bg-lime-600/10 blur-[120px]" />
 
       <div className="relative mx-auto max-w-7xl animate-fade-in">
-        <header className="mb-16 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-dark-600 bg-dark-800/50 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-cyan-400 backdrop-blur-md">
-            <Activity className="h-4 w-4" />
-            <span>StatXI</span>
-          </div>
-          <h1 className="mb-8 font-display text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
-            Discover the <span className="bg-gradient-to-r from-cyan-400 to-lime-400 bg-clip-text text-transparent">Elite.</span>
-          </h1>
-
-          <div className="mx-auto mt-8 w-full max-w-2xl animate-rise">
-            <div className="group relative flex items-center rounded-full border border-dark-600 bg-dark-800/80 px-6 py-4 shadow-2xl backdrop-blur-xl transition-all focus-within:border-cyan-500/50 focus-within:ring-4 focus-within:ring-cyan-500/10 hover:border-dark-600/80">
-              <Search className="mr-4 h-6 w-6 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
-              <input
-                id="search"
-                type="text"
-                value={query}
-                onChange={(event) => {
-                  setQuery(event.target.value);
-                  setCurrentPage(1);
-                }}
-                placeholder="Search players by name..."
-                className="w-full bg-transparent text-lg font-medium text-white placeholder:text-slate-500 outline-none"
-              />
+        {!selectedPlayer && (
+          <header className="mb-16 text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-dark-600 bg-dark-800/50 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-cyan-400 backdrop-blur-md">
+              <Activity className="h-4 w-4" />
+              <span>StatXI</span>
             </div>
-          </div>
-        </header>
+            <h1 className="mb-8 font-display text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
+              Discover the <span className="bg-gradient-to-r from-cyan-400 to-lime-400 bg-clip-text text-transparent">Elite.</span>
+            </h1>
+
+            <div className="mx-auto mt-8 w-full max-w-2xl animate-rise">
+              <div className="group relative flex items-center rounded-full border border-dark-600 bg-dark-800/80 px-6 py-4 shadow-2xl backdrop-blur-xl transition-all focus-within:border-cyan-500/50 focus-within:ring-4 focus-within:ring-cyan-500/10 hover:border-dark-600/80">
+                <Search className="mr-4 h-6 w-6 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                <input
+                  id="search"
+                  type="text"
+                  value={query}
+                  onChange={(event) => {
+                    setQuery(event.target.value);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="Search players by name..."
+                  className="w-full bg-transparent text-lg font-medium text-white placeholder:text-slate-500 outline-none"
+                />
+              </div>
+            </div>
+          </header>
+        )}
 
         <section className="relative z-10 animate-rise" style={{ animationDelay: "0.2s" }}>
-          {loadingDataset ? (
+          {selectedPlayer ? (
+            <PlayerProfile player={selectedPlayer} onBack={() => setSelectedPlayer(null)} />
+          ) : (
+            <>
+              {loadingDataset ? (
             <div className="flex h-40 items-center justify-center">
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-500 border-t-transparent" />
             </div>
@@ -241,7 +249,8 @@ function App() {
               {paginatedResults.map((player, index) => (
                 <article
                   key={player.id}
-                  className="group relative overflow-hidden rounded-3xl border border-dark-600 bg-dark-800/60 p-6 transition-all hover:-translate-y-1 hover:border-cyan-500/30 hover:bg-dark-800 hover:shadow-2xl hover:shadow-cyan-500/5 backdrop-blur-md"
+                  onClick={() => setSelectedPlayer(player)}
+                  className="group relative overflow-hidden rounded-3xl cursor-pointer border border-dark-600 bg-dark-800/60 p-6 transition-all hover:-translate-y-1 hover:border-cyan-500/30 hover:bg-dark-800 hover:shadow-2xl hover:shadow-cyan-500/5 backdrop-blur-md"
                   style={{ animationDelay: `${(index % RESULTS_PER_PAGE) * 0.05}s` }}
                 >
                   {/* Background Watermark Rating */}
@@ -310,6 +319,8 @@ function App() {
               </div>
             </div>
           ) : null}
+            </>
+          )}
         </section>
       </div>
     </div>
