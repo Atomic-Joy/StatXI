@@ -226,99 +226,99 @@ function App() {
           ) : (
             <>
               {loadingDataset ? (
-            <div className="flex h-40 items-center justify-center">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-500 border-t-transparent" />
-            </div>
-          ) : null}
-          {!loadingDataset && datasetError ? <p className="text-center text-red-400">{datasetError}</p> : null}
-          {!loadingDataset && !datasetError && !query.trim() ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center text-slate-500">
-              <Search className="mb-4 h-12 w-12 opacity-20" />
-              <p className="text-lg">Type at least 3 letters to explore the database.</p>
-            </div>
-          ) : null}
-          {!loadingDataset && !datasetError && query.trim() && query.trim().length < 3 ? (
-            <p className="text-center text-slate-400">Keep typing to search...</p>
-          ) : null}
-          {!loadingDataset && !datasetError && query.trim().length >= 3 && searchResults.length === 0 ? (
-            <p className="text-center text-red-400">No athletes found matching your criteria.</p>
-          ) : null}
-
-          {searchResults.length > 0 ? (
-            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {paginatedResults.map((player, index) => (
-                <article
-                  key={player.id}
-                  onClick={() => setSelectedPlayer(player)}
-                  className="group relative overflow-hidden rounded-3xl cursor-pointer border border-dark-600 bg-dark-800/60 p-6 transition-all hover:-translate-y-1 hover:border-cyan-500/30 hover:bg-dark-800 hover:shadow-2xl hover:shadow-cyan-500/5 backdrop-blur-md"
-                  style={{ animationDelay: `${(index % RESULTS_PER_PAGE) * 0.05}s` }}
-                >
-                  {/* Background Watermark Rating */}
-                  {/* <div className="absolute -right-6 -bottom-8 pointer-events-none select-none text-[140px] font-display font-bold leading-none tracking-tighter text-white/[0.03] transition-colors group-hover:text-cyan-500/[0.05]">
-                    {player.overall}
-                  </div> */}
-
-                  <div className="relative z-10 flex flex-col h-full">
-                    <div className="mb-4 flex items-start justify-between">
-                      <div>
-                        <h3 className="font-display text-2xl font-bold text-white group-hover:text-cyan-50">{player.name}</h3>
-                        {player.longName && player.longName !== player.name ? (
-                          <p className="mt-1 text-sm text-slate-400">{player.longName}</p>
-                        ) : null}
-                      </div>
-                    </div>
-
-                    <div className="mt-auto pt-6">
-                      <div className="mb-4 flex items-center gap-2 text-sm text-slate-300">
-                        <MapPin className="h-4 w-4 text-lime-400" />
-                        <span>{player.nationality}</span>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {player.position.split(',').map((pos, i) => (
-                          <span key={i} className="rounded-md border border-dark-600 bg-dark-900/50 px-2.5 py-1 text-xs font-medium text-slate-300">
-                            {pos.trim()}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : null}
-
-          {searchResults.length > 0 ? (
-            <div className="mt-12 flex flex-col items-center justify-between gap-4 rounded-2xl border border-dark-600 bg-dark-800/50 p-4 sm:flex-row backdrop-blur-md">
-              <p className="text-sm font-medium text-slate-400">
-                Showing <span className="text-white">{(currentPage - 1) * RESULTS_PER_PAGE + 1}</span> to{" "}
-                <span className="text-white">{Math.min(currentPage * RESULTS_PER_PAGE, searchResults.length)}</span> of{" "}
-                <span className="text-white">{searchResults.length}</span> athletes
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
-                  disabled={currentPage === 1}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-dark-600 bg-dark-700 text-white transition-all hover:bg-dark-600 disabled:pointer-events-none disabled:opacity-30"
-                  aria-label="Previous page"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <div className="flex h-10 items-center justify-center rounded-xl border border-dark-600 bg-dark-900/50 px-4 text-sm font-semibold text-white">
-                  {currentPage} / {totalPages}
+                <div className="flex h-40 items-center justify-center">
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-500 border-t-transparent" />
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
-                  disabled={currentPage === totalPages}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-dark-600 bg-dark-700 text-white transition-all hover:bg-dark-600 disabled:pointer-events-none disabled:opacity-30"
-                  aria-label="Next page"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-          ) : null}
+              ) : null}
+              {!loadingDataset && datasetError ? <p className="text-center text-red-400">{datasetError}</p> : null}
+              {!loadingDataset && !datasetError && !query.trim() ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center text-slate-500">
+                  <Search className="mb-4 h-12 w-12 opacity-20" />
+                  <p className="text-lg">Type at least 3 letters to explore the database.</p>
+                </div>
+              ) : null}
+              {!loadingDataset && !datasetError && query.trim() && query.trim().length < 3 ? (
+                <p className="text-center text-slate-400">Keep typing to search...</p>
+              ) : null}
+              {!loadingDataset && !datasetError && query.trim().length >= 3 && searchResults.length === 0 ? (
+                <p className="text-center text-red-400">No athletes found matching your criteria.</p>
+              ) : null}
+
+              {searchResults.length > 0 ? (
+                <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {paginatedResults.map((player, index) => (
+                    <article
+                      key={player.id}
+                      onClick={() => setSelectedPlayer(player)}
+                      className="group relative overflow-hidden rounded-3xl cursor-pointer border border-dark-600 bg-dark-800/60 p-6 transition-all hover:-translate-y-1 hover:border-cyan-500/30 hover:bg-dark-800 hover:shadow-2xl hover:shadow-cyan-500/5 backdrop-blur-md"
+                      style={{ animationDelay: `${(index % RESULTS_PER_PAGE) * 0.05}s` }}
+                    >
+                      {/* Background Watermark Rating */}
+                      <div className="absolute -right-1 -bottom-6 pointer-events-none select-none text-[140px] font-display font-bold leading-none tracking-tighter text-white/[0.03] transition-colors group-hover:text-cyan-500/[0.05]">
+                        {player.overall}
+                      </div>
+
+                      <div className="relative z-10 flex flex-col h-full">
+                        <div className="mb-4 flex items-start justify-between">
+                          <div>
+                            <h3 className="font-display text-2xl font-bold text-white group-hover:text-cyan-50">{player.name}</h3>
+                            {player.longName && player.longName !== player.name ? (
+                              <p className="mt-1 text-sm text-slate-400">{player.longName}</p>
+                            ) : null}
+                          </div>
+                        </div>
+
+                        <div className="mt-auto pt-6">
+                          <div className="mb-4 flex items-center gap-2 text-sm text-slate-300">
+                            <MapPin className="h-4 w-4 text-lime-400" />
+                            <span>{player.nationality}</span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {player.position.split(',').map((pos, i) => (
+                              <span key={i} className="rounded-md border border-dark-600 bg-dark-900/50 px-2.5 py-1 text-xs font-medium text-slate-300">
+                                {pos.trim()}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+
+              {searchResults.length > 0 ? (
+                <div className="mt-12 flex flex-col items-center justify-between gap-4 rounded-2xl border border-dark-600 bg-dark-800/50 p-4 sm:flex-row backdrop-blur-md">
+                  <p className="text-sm font-medium text-slate-400">
+                    Showing <span className="text-white">{(currentPage - 1) * RESULTS_PER_PAGE + 1}</span> to{" "}
+                    <span className="text-white">{Math.min(currentPage * RESULTS_PER_PAGE, searchResults.length)}</span> of{" "}
+                    <span className="text-white">{searchResults.length}</span> athletes
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                      disabled={currentPage === 1}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-dark-600 bg-dark-700 text-white transition-all hover:bg-dark-600 disabled:pointer-events-none disabled:opacity-30"
+                      aria-label="Previous page"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </button>
+                    <div className="flex h-10 items-center justify-center rounded-xl border border-dark-600 bg-dark-900/50 px-4 text-sm font-semibold text-white">
+                      {currentPage} / {totalPages}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                      disabled={currentPage === totalPages}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-dark-600 bg-dark-700 text-white transition-all hover:bg-dark-600 disabled:pointer-events-none disabled:opacity-30"
+                      aria-label="Next page"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+              ) : null}
             </>
           )}
         </section>
