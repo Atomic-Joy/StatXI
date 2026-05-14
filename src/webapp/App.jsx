@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Search, User, MapPin, Activity, ChevronLeft, ChevronRight } from "lucide-react";
 import PlayerProfile from "./PlayerProfile";
 
-const CSV_URL = new URL("./players.csv", import.meta.url).href;
+const CSV_URL = new URL("../Data/EAFC26.csv", import.meta.url).href;
 const RESULTS_PER_PAGE = 21;
 const POSITION_FULL_FORM = {
   GK: "Goalkeeper",
@@ -88,22 +88,32 @@ function parsePlayersCSV(csvText) {
   if (lines.length < 2) return [];
 
   const headers = parseCSVLine(lines[0]);
-  const nameIndex = headers.indexOf("short_name");
-  const longNameIndex = headers.indexOf("long_name");
-  const nationalityIndex = headers.indexOf("nationality_name");
-  const positionIndex = headers.indexOf("player_positions");
-  const playerIdIndex = headers.indexOf("player_id");
-  const overallIndex = headers.indexOf("overall");
+  const nameIndex = headers.indexOf("Name");
+  const nationalityIndex = headers.indexOf("Nation");
+  const positionIndex = headers.indexOf("Position");
+  const playerIdIndex = headers.indexOf("ID");
+  const overallIndex = headers.indexOf("OVR");
+  
+  const teamIndex = headers.indexOf("Team");
+  const ageIndex = headers.indexOf("Age");
+  const heightIndex = headers.indexOf("Height");
+  const weightIndex = headers.indexOf("Weight");
+  const photoIndex = headers.indexOf("card");
 
   return lines.slice(1).map((line, idx) => {
     const cols = parseCSVLine(line);
     return {
       id: cols[playerIdIndex] || String(idx + 1),
       name: cols[nameIndex] || "Unknown",
-      longName: cols[longNameIndex] || "",
+      longName: cols[nameIndex] || "",
       nationality: cols[nationalityIndex] || "Nationality N/A",
       position: formatPositions(cols[positionIndex]) || "Position N/A",
-      overall: Number(cols[overallIndex]) || 0
+      overall: Number(cols[overallIndex]) || 0,
+      team: cols[teamIndex] || "Club N/A",
+      age: cols[ageIndex] || "N/A",
+      height: cols[heightIndex] ? cols[heightIndex].replace(/""/g, '"') : "N/A",
+      weight: cols[weightIndex] || "N/A",
+      photo: cols[photoIndex] || null,
     };
   });
 }

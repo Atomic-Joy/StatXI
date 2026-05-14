@@ -1,107 +1,12 @@
-import { useEffect, useState } from "react";
-import { ArrowLeft, MapPin, Shield, Activity, Calendar, AlertCircle } from "lucide-react";
+import { ArrowLeft, MapPin, Shield, Activity, User } from "lucide-react";
 
 function PlayerProfile({ player, onBack }) {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let isMounted = true;
-    async function fetchProfile() {
-      try {
-        setLoading(true);
-        setError("");
-
-        // Construct potential search queries
-        let queriesToTry = [];
-        if (player.longName) {
-          const parts = player.longName.trim().split(/\s+/);
-          if (parts.length > 1) {
-            queriesToTry.push(`${parts[0]} ${parts[parts.length - 1]}`);
-          }
-          queriesToTry.push(player.longName);
-        }
-        if (player.name) {
-          queriesToTry.push(player.name);
-          const nameParts = player.name.split(".").map(s => s.trim()).filter(Boolean);
-          if (nameParts.length > 1) {
-            queriesToTry.push(nameParts[nameParts.length - 1]);
-          }
-        }
-
-        queriesToTry = [...new Set(queriesToTry)];
-
-        let foundPlayer = null;
-
-        for (const query of queriesToTry) {
-          if (!query) continue;
-
-          const searchRes = await fetch(
-            `https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(query)}`
-          );
-          if (!searchRes.ok) continue;
-
-          const searchData = await searchRes.json();
-
-          if (searchData.player && searchData.player.length > 0) {
-            const queryLastWord = query.split(" ").pop().toLowerCase();
-
-            foundPlayer = searchData.player.find(
-              (p) =>
-                p.strSport === "Soccer" &&
-                p.strPlayer.toLowerCase().includes(queryLastWord)
-            );
-
-            if (!foundPlayer) {
-              foundPlayer = searchData.player.find(p => p.strSport === "Soccer");
-            }
-
-            if (foundPlayer) {
-              break;
-            }
-          }
-        }
-
-        if (foundPlayer && foundPlayer.idPlayer) {
-          const lookupRes = await fetch(
-            `https://www.thesportsdb.com/api/v1/json/3/lookupplayer.php?id=${foundPlayer.idPlayer}`
-          );
-          if (!lookupRes.ok) throw new Error("Failed to load profile details.");
-          const lookupData = await lookupRes.json();
-
-          if (lookupData.players && lookupData.players.length > 0) {
-            if (isMounted) setProfile(lookupData.players[0]);
-            return;
-          }
-        }
-
-        if (isMounted) setProfile(null);
-      } catch (err) {
-        console.error(err);
-        if (isMounted) setError("Could not fetch advanced profile data.");
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    }
-
-    fetchProfile();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [player.name]);
-
-  const displayPhoto = profile?.strCutout || profile?.strThumb || null;
-  const team = profile?.strTeam || "Club N/A";
-  const status = profile?.strStatus || "Status N/A";
-  const dob = profile?.dateBorn || "DOB N/A";
-  let bio = profile?.strDescriptionEN || "No biography available for this athlete.";
-  if (bio !== "No biography available for this athlete.") {
-    bio = bio.split(/\n+/)[0];
-  }
-  const height = profile?.strHeight || "";
-  const weight = profile?.strWeight || "";
+  const displayPhoto = player.photo;
+  const team = player.team || "Club N/A";
+  const age = player.age || "Age N/A";
+  const height = player.height || "N/A";
+  const weight = player.weight || "N/A";
+  const bio = `${player.name} is a professional footballer from ${player.nationality}, currently playing for ${team}.`;
 
   return (
     <div className="animate-fade-in">
@@ -121,11 +26,7 @@ function PlayerProfile({ player, onBack }) {
             <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 to-transparent opacity-50" />
 
             <div className="relative z-10 flex flex-col items-center">
-              {loading ? (
-                <div className="flex h-64 w-full items-center justify-center">
-                  <div className="h-10 w-10 animate-spin rounded-full border-2 border-cyan-500 border-t-transparent" />
-                </div>
-              ) : displayPhoto ? (
+              {displayPhoto ? (
                 <img
                   src={displayPhoto}
                   alt={player.name}
@@ -139,7 +40,7 @@ function PlayerProfile({ player, onBack }) {
               )}
 
               <h2 className="mt-6 font-display text-3xl font-bold text-white text-center">
-                {profile?.strPlayer || player.name}
+                {player.name}
               </h2>
               {player.longName && player.longName !== player.name && (
                 <p className="mt-2 text-center text-sm text-slate-400">{player.longName}</p>
@@ -150,7 +51,7 @@ function PlayerProfile({ player, onBack }) {
                   <MapPin className="h-5 w-5 text-lime-400" />
                   <div>
                     <p className="text-xs text-slate-500 uppercase tracking-wider">Nationality</p>
-                    <p className="text-sm font-medium text-white">{profile?.strNationality || player.nationality}</p>
+                    <p className="text-sm font-medium text-white">{player.nationality}</p>
                   </div>
                 </div>
 
@@ -163,44 +64,24 @@ function PlayerProfile({ player, onBack }) {
                 </div>
 
                 <div className="flex items-center gap-3 rounded-xl bg-dark-900/50 p-3">
-                  <Calendar className="h-5 w-5 text-purple-400" />
+                  <User className="h-5 w-5 text-purple-400" />
                   <div>
-                    <p className="text-xs text-slate-500 uppercase tracking-wider">Date of Birth</p>
-                    <p className="text-sm font-medium text-white">{dob}</p>
+                    <p className="text-xs text-slate-500 uppercase tracking-wider">Age</p>
+                    <p className="text-sm font-medium text-white">{age}</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Fallback/Error state */}
-          {!loading && (!profile || error) && (
-            <div className="rounded-2xl border border-orange-500/20 bg-orange-500/10 p-4 text-sm text-orange-200">
-              <div className="flex items-center gap-2 mb-2 font-medium">
-                <AlertCircle className="h-4 w-4" />
-                Limited Data Available
-              </div>
-              We couldn't fetch extended profile details for this player from the database. Displaying basic local statistics.
-            </div>
-          )}
         </div>
 
         {/* Right Column: Bio & Detailed Info */}
         <div className="flex flex-col gap-8">
           <div className="rounded-3xl border border-dark-600 bg-dark-800/60 p-8 shadow-2xl backdrop-blur-xl">
             <h3 className="mb-6 font-display text-2xl font-bold text-white">Biography</h3>
-            {loading ? (
-              <div className="space-y-3 animate-pulse">
-                <div className="h-4 w-full rounded bg-dark-600"></div>
-                <div className="h-4 w-5/6 rounded bg-dark-600"></div>
-                <div className="h-4 w-4/6 rounded bg-dark-600"></div>
-                <div className="h-4 w-full rounded bg-dark-600"></div>
-              </div>
-            ) : (
-              <div className="prose prose-invert max-w-none text-slate-300">
-                <p className="whitespace-pre-line leading-relaxed">{bio}</p>
-              </div>
-            )}
+            <div className="prose prose-invert max-w-none text-slate-300">
+              <p className="whitespace-pre-line leading-relaxed">{bio}</p>
+            </div>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2">
@@ -209,11 +90,11 @@ function PlayerProfile({ player, onBack }) {
               <div className="space-y-4">
                 <div className="flex justify-between border-b border-dark-600/50 pb-2">
                   <span className="text-slate-400">Height</span>
-                  <span className="font-medium text-white">{loading ? "..." : (height || "N/A")}</span>
+                  <span className="font-medium text-white">{height}</span>
                 </div>
                 <div className="flex justify-between border-b border-dark-600/50 pb-2">
                   <span className="text-slate-400">Weight</span>
-                  <span className="font-medium text-white">{loading ? "..." : (weight || "N/A")}</span>
+                  <span className="font-medium text-white">{weight}</span>
                 </div>
               </div>
             </div>
