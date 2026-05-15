@@ -118,7 +118,9 @@ function parsePlayersCSV(csvText) {
   });
 }
 
-function App() {
+import HomeSection from "./HomeSection";
+
+function PlayerSearch() {
   const [query, setQuery] = useState("");
   const [allPlayers, setAllPlayers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -333,6 +335,33 @@ function App() {
           )}
         </section>
       </div>
+    </div>
+  );
+}
+
+function App() {
+  const [currentRoute, setCurrentRoute] = useState(window.location.pathname);
+
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setCurrentRoute(window.location.pathname);
+    };
+
+    window.addEventListener("popstate", handleLocationChange);
+    return () => window.removeEventListener("popstate", handleLocationChange);
+  }, []);
+
+  if (currentRoute === "/" || currentRoute === "/index.html") {
+    return <HomeSection />;
+  }
+
+  if (currentRoute === "/players") {
+    return <PlayerSearch />;
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-dark-900 text-white">
+      <h1 className="text-3xl font-bold">404 - Not Found</h1>
     </div>
   );
 }
