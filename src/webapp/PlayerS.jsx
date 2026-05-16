@@ -478,7 +478,22 @@ function App() {
   useEffect(() => {
     const handler = () => setCurrentRoute(window.location.pathname);
     window.addEventListener("popstate", handler);
-    return () => window.removeEventListener("popstate", handler);
+    
+    // Intercept all internal link clicks to make it a true SPA
+    const handleGlobalClick = (e) => {
+      const anchor = e.target.closest("a");
+      if (anchor && anchor.href && anchor.host === window.location.host && !anchor.target) {
+        e.preventDefault();
+        window.history.pushState({}, "", anchor.pathname);
+        setCurrentRoute(anchor.pathname);
+      }
+    };
+    window.addEventListener("click", handleGlobalClick);
+
+    return () => {
+      window.removeEventListener("popstate", handler);
+      window.removeEventListener("click", handleGlobalClick);
+    };
   }, []);
 
   if (currentRoute === "/" || currentRoute === "/index.html") return <HomeSection />;
@@ -487,7 +502,7 @@ function App() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-dark-900 text-white">
-      <h1 className="text-3xl font-bold">404 - Not Found</h1>
+      <h1 className="text-3xl font-bold">404 - Page Not Found</h1>
     </div>
   );
 }
