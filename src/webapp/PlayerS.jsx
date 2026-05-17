@@ -69,9 +69,9 @@ import Clubs from "./Clubs";
 // ── OVR colour tier ────────────────────────────────────────────────────────────
 function ovrStyle(ovr) {
   if (ovr >= 88) return { ring: "ring-amber-400/60", badge: "from-amber-400 to-orange-400", text: "text-amber-400" };
-  if (ovr >= 80) return { ring: "ring-cyan-500/50",  badge: "from-cyan-400 to-blue-500",   text: "text-cyan-400"  };
-  if (ovr >= 70) return { ring: "ring-slate-400/40", badge: "from-slate-400 to-slate-500",  text: "text-slate-400" };
-  return               { ring: "ring-zinc-600/30",   badge: "from-zinc-600 to-zinc-700",    text: "text-zinc-500"  };
+  if (ovr >= 80) return { ring: "ring-cyan-500/50", badge: "from-cyan-400 to-blue-500", text: "text-cyan-400" };
+  if (ovr >= 70) return { ring: "ring-slate-400/40", badge: "from-slate-400 to-slate-500", text: "text-slate-400" };
+  return { ring: "ring-zinc-600/30", badge: "from-zinc-600 to-zinc-700", text: "text-zinc-500" };
 }
 
 // ── Player Card ────────────────────────────────────────────────────────────────
@@ -291,7 +291,7 @@ function PlayerS() {
             <div className="flex items-center gap-4">
               <a href="/clubs" className="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">Clubs</a>
               <div className="h-4 w-px bg-white/[0.1] hidden sm:block" />
-              
+
               {/* Right pill: dataset indicator */}
               <div className="hidden sm:flex items-center gap-1.5 rounded-full border border-white/[0.07] bg-white/[0.03] px-3 py-1.5 shrink-0">
                 <span className="h-1.5 w-1.5 rounded-full bg-lime-400 animate-pulse" />
@@ -347,7 +347,7 @@ function PlayerS() {
 
                 {/* Hint chips */}
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
-                  {["Mbappe", "Bellingham", "Haaland", "Vinicius", "Salah"].map(name => (
+                  {["Kane", "Bellingham", "Haaland", "Musiala", "Salah"].map(name => (
                     <button
                       key={name}
                       onClick={() => setQuery(name)}
@@ -445,11 +445,10 @@ function PlayerS() {
                             <button
                               key={page}
                               onClick={() => setCurrentPage(page)}
-                              className={`h-9 min-w-[36px] rounded-xl px-2 text-sm font-semibold transition-all border ${
-                                page === currentPage
-                                  ? "bg-cyan-500 border-cyan-500 text-black"
-                                  : "border-white/[0.07] bg-white/[0.04] text-slate-400 hover:text-white hover:bg-white/[0.08]"
-                              }`}
+                              className={`h-9 min-w-[36px] rounded-xl px-2 text-sm font-semibold transition-all border ${page === currentPage
+                                ? "bg-cyan-500 border-cyan-500 text-black"
+                                : "border-white/[0.07] bg-white/[0.04] text-slate-400 hover:text-white hover:bg-white/[0.08]"
+                                }`}
                             >
                               {page}
                             </button>
@@ -483,7 +482,7 @@ function App() {
   useEffect(() => {
     const handler = () => setCurrentRoute(window.location.pathname);
     window.addEventListener("popstate", handler);
-    
+
     // Intercept all internal link clicks to make it a true SPA
     const handleGlobalClick = (e) => {
       const anchor = e.target.closest("a");
