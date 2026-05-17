@@ -52,8 +52,12 @@ function ClubProfile({ club, onBack }) {
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-transparent" />
         
         <div className="relative flex flex-col md:flex-row items-center gap-10">
-          <div className={`shrink-0 h-32 w-32 rounded-3xl ${tierBg} ${tierBorder} border flex items-center justify-center shadow-2xl shadow-black`}>
-            <Shield className={`h-16 w-16 ${tierColor}`} />
+          <div className={`shrink-0 h-32 w-32 rounded-3xl ${tierBg} ${tierBorder} border flex items-center justify-center shadow-2xl shadow-black overflow-hidden p-4`}>
+            {club.logo ? (
+              <img src={club.logo} alt={club.name} className="h-full w-full object-contain" />
+            ) : (
+              <Shield className={`h-16 w-16 ${tierColor}`} />
+            )}
           </div>
 
           <div className="flex-1 text-center md:text-left">
@@ -132,7 +136,47 @@ function ClubProfile({ club, onBack }) {
           </div>
 
           <div className="rounded-3xl border border-white/[0.06] bg-white/[0.03] p-8">
-            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-amber-500 mb-6">Elite Talent</h3>
+            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-amber-500 mb-6">Club Details</h3>
+            <div className="space-y-4">
+              {club.coach && (
+                <div className="flex items-center gap-4 p-3 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+                  <div className="h-10 w-10 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center">
+                    <User className="h-5 w-5 text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Head Coach</p>
+                    <p className="text-sm font-bold text-white">{club.coach}</p>
+                  </div>
+                </div>
+              )}
+              {club.stadium && (
+                <div className="flex items-center gap-4 p-3 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+                  <div className="h-10 w-10 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center">
+                    <MapPin className="h-5 w-5 text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Stadium</p>
+                    <p className="text-sm font-bold text-white leading-tight">{club.stadium}</p>
+                    {club.capacity && <p className="text-[10px] text-slate-500">{Number(club.capacity).toLocaleString()} Seats</p>}
+                  </div>
+                </div>
+              )}
+              {club.marketValue && (
+                <div className="flex items-center gap-4 p-3 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+                  <div className="h-10 w-10 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center">
+                    <TrendingUp className="h-5 w-5 text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Market Value</p>
+                    <p className="text-sm font-bold text-white">{club.marketValue}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-white/[0.06] bg-white/[0.03] p-8">
+            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-500 mb-6">Elite Talent</h3>
             <div className="space-y-4">
               {malePlayers.length > 0 && (
                 <div className="flex items-center gap-4 p-3 rounded-2xl bg-white/[0.02] border border-white/[0.04]">

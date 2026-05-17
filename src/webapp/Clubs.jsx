@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ClubProfile from "./ClubProfile";
 
 const CSV_URL = new URL("../Data/EAFC26.csv", import.meta.url).href;
+const LOGOS_CSV_URL = new URL("../Data/clubs_with_logos.csv", import.meta.url).href;
 const CLUBS_PER_PAGE = 12;
 
 function normalizeText(value) {
@@ -25,7 +26,32 @@ function parseCSVLine(line) {
   values.push(current); return values;
 }
 
-function parseClubsFromCSV(csvText) {
+function parseClubsFromCSV(csvText, logosCsvText) {
+  // 1. Parse Logos Mapping (Direct 1:1 mapping using the 'Team' column)
+  const logoMap = {};
+  if (logosCsvText) {
+    const logoLines = logosCsvText.split(/\r?\n/).filter(Boolean);
+    if (logoLines.length > 1) {
+      const logoHeaders = parseCSVLine(logoLines[0]);
+      const lIdx = (col) => logoHeaders.indexOf(col);
+      logoLines.slice(1).forEach(line => {
+        const c = parseCSVLine(line);
+        const teamName = c[lIdx("Team")];
+        // Only set if not already set, to avoid redundant processing of duplicates
+        if (teamName && !logoMap[teamName]) {
+          logoMap[teamName] = {
+            logo: c[lIdx("Logo_URL")],
+            stadium: c[lIdx("stadium_name")],
+            capacity: c[lIdx("stadium_seats")],
+            marketValue: c[lIdx("total_market_value")],
+            coach: c[lIdx("coach_name")]
+          };
+        }
+      });
+    }
+  }
+
+  // 2. Parse EAFC Clubs
   const lines = csvText.split(/\r?\n/).filter(Boolean);
   if (lines.length < 2) return [];
   const headers = parseCSVLine(lines[0]);
@@ -50,13 +76,20 @@ function parseClubsFromCSV(csvText) {
     };
 
     if (!clubMap[teamName]) {
+      const enriched = logoMap[teamName] || {};
+      
       clubMap[teamName] = {
         name: teamName,
         league: leagueName,
         players: [],
         totalOvr: 0,
         totalAge: 0,
-        topPlayer: { name: "", ovr: 0 }
+        topPlayer: { name: "", ovr: 0 },
+        logo: enriched.logo || null,
+        stadium: enriched.stadium || null,
+        capacity: enriched.capacity || null,
+        marketValue: enriched.marketValue || null,
+        coach: enriched.coach || null
       };
     }
 
@@ -96,8 +129,12 @@ function ClubCard({ club, index, onClick }) {
       {/* Top Section */}
       <div className="relative p-6">
         <div className="flex items-start justify-between gap-4 mb-4">
-          <div className="h-12 w-12 rounded-2xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-            <Shield className={`h-6 w-6 ${tierColor}`} />
+          <div className="h-12 w-12 rounded-2xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center group-hover:scale-110 transition-transform duration-500 overflow-hidden p-2">
+            {club.logo ? (
+              <img src={club.logo} alt={club.name} className="h-full w-full object-contain" />
+            ) : (
+              <Shield className={`h-6 w-6 ${tierColor}`} />
+            )}
           </div>
           <div className="text-right">
             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Squad Rating</p>
@@ -176,9 +213,15 @@ export default function Clubs() {
     async function fetchClubs() {
       try {
         setLoading(true);
-        const res = await fetch(CSV_URL);
-        const text = await res.text();
-        const clubs = parseClubsFromCSV(text);
+        const [eafcRes, logosRes] = await Promise.all([
+          fetch(CSV_URL),
+          fetch(LOGOS_CSV_URL)
+        ]);
+        
+        const eafcText = await eafcRes.text();
+        const logosText = await logosRes.text();
+        
+        const clubs = parseClubsFromCSV(eafcText, logosText);
         setAllClubs(clubs);
       } catch (err) {
         console.error("Failed to load clubs:", err);
